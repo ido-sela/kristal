@@ -6,6 +6,15 @@ import { createClient } from "@/lib/supabase/server";
 import { adminDb } from "@/lib/supabase/admin";
 import { runRequest } from "@/lib/ai";
 
+export async function login(fd: FormData) {
+  const sb = await createClient();
+  const { error } = await sb.auth.signInWithPassword({
+    email: String(fd.get("email")), password: String(fd.get("password")),
+  });
+  if (error) redirect("/login?error=1");
+  redirect("/");
+}
+
 export async function loginWithGoogle() {
   const h = await headers();
   const host = h.get("x-forwarded-host") ?? h.get("host");
