@@ -1,17 +1,22 @@
 "use server";
 import { redirect } from "next/navigation";
+import { headers } from "next/headers";
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { adminDb } from "@/lib/supabase/admin";
 import { runRequest } from "@/lib/ai";
 
-export async function login(fd: FormData) {
+export async function loginWithGoogle() {
+  const h = await headers();
+  const host = h.get("x-forwarded-host") ?? h.get("host");
+  const proto = h.get("x-forwarded-proto") ?? "https";
   const sb = await createClient();
-  const { error } = await sb.auth.signInWithPassword({
-    email: String(fd.get("email")), password: String(fd.get("password")),
+  const { data, error } = await sb.auth.signInWithOAuth({
+    provider: "google",
+    options: { redirectTo: `${proto}://${host}/auth/callback` },
   });
-  if (error) redirect("/login?error=1");
-  redirect("/");
+  if (error || !data.url) redirect("/login?error=1");
+  redirect(data.url);
 }
 
 export async function logout() {

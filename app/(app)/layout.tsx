@@ -5,7 +5,15 @@ import { logout } from "../actions";
 export default async function AppLayout({ children }: { children: React.ReactNode }) {
   const sb = await createClient();
   const { data: { user } } = await sb.auth.getUser();
-  const { data: p } = await sb.from("profiles").select("role").eq("id", user?.id ?? "").single();
+  const { data: p } = await sb.from("profiles").select("role, client_id").eq("id", user?.id ?? "").single();
+  if (p?.role !== "admin" && !p?.client_id) {
+    return (
+      <div className="mx-auto mt-32 max-w-sm rounded bg-white p-6 text-center shadow">
+        <p className="mb-4">אין לך עדיין גישה למערכת. פנה למנהל.</p>
+        <form action={logout}><button className="text-sm text-gray-500">יציאה</button></form>
+      </div>
+    );
+  }
   return (
     <div className="mx-auto max-w-4xl p-6">
       <nav className="mb-6 flex items-center gap-4 border-b pb-3">
