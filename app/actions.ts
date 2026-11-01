@@ -11,7 +11,7 @@ export async function login(fd: FormData) {
   const { error } = await sb.auth.signInWithPassword({
     email: String(fd.get("email")), password: String(fd.get("password")),
   });
-  if (error) redirect("/login?error=1");
+  if (error) redirect(`/login?error=1&reason=${encodeURIComponent(error.message.slice(0, 120))}`);
   redirect("/");
 }
 
