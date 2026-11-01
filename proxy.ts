@@ -18,7 +18,7 @@ export async function proxy(req: NextRequest) {
     },
   );
   const { data: { user } } = await sb.auth.getUser();
-  if (!user && !req.nextUrl.pathname.startsWith("/login") && !req.nextUrl.pathname.startsWith("/auth/")) {
+  if (!user && !req.nextUrl.pathname.startsWith("/login") && !req.nextUrl.pathname.startsWith("/auth/") && !req.nextUrl.pathname.startsWith("/forgot")) {
     return NextResponse.redirect(new URL("/login", req.url));
   }
   return res;

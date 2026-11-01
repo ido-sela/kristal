@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { login } from "../actions";
 // כניסה עם Google קיימת ב-loginWithGoogle (app/actions.ts); מחזירים אותה כשמוגדר ב-Supabase.
 export default async function Login({ searchParams }: { searchParams: Promise<{ error?: string }> }) {
@@ -9,6 +10,7 @@ export default async function Login({ searchParams }: { searchParams: Promise<{ 
       <input name="password" type="password" placeholder="סיסמה" required className="rounded border p-2" />
       {error && <p className="text-sm text-red-600">פרטים שגויים</p>}
       <button className="rounded bg-black p-2 text-white">כניסה</button>
+      <Link href="/forgot" className="text-center text-sm text-gray-500">שכחתי סיסמה</Link>
     </form>
   );
 }

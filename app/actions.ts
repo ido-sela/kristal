@@ -91,3 +91,26 @@ export async function updateClient(fd: FormData) {
   }).eq("id", String(fd.get("id")));
   revalidatePath("/admin");
 }
+
+async function baseUrl() {
+  const h = await headers();
+  const host = h.get("x-forwarded-host") ?? h.get("host");
+  return `${h.get("x-forwarded-proto") ?? "https"}://${host}`;
+}
+
+export async function requestPasswordReset(fd: FormData) {
+  const sb = await createClient();
+  await sb.auth.resetPasswordForEmail(String(fd.get("email")), {
+    redirectTo: `${await baseUrl()}/auth/callback?next=/reset`,
+  });
+  redirect("/forgot?sent=1"); // אותה תשובה תמיד, בלי לחשוף אם האימייל קיים
+}
+
+export async function setNewPassword(fd: FormData) {
+  const password = String(fd.get("password"));
+  if (password.length < 8) redirect("/reset?error=1");
+  const sb = await createClient();
+  const { error } = await sb.auth.updateUser({ password });
+  if (error) redirect("/reset?error=1");
+  redirect("/");
+}
